@@ -1,0 +1,1 @@
+include ':app',':dexlibrary1',':dexlibrary2'

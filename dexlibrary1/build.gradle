@@ -1,0 +1,42 @@
+apply plugin: 'com.android.library'
+android {
+    compileSdkVersion 27
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+//删除isshowtoast.jar包任务
+task clearJar(type: Delete) {
+    delete 'libs/testDex.jar'
+}
+task makeJar(type: Jar) {
+    //指定生成的jar名
+    baseName 'testDex'
+    //从哪里打包class文件
+    from('build/intermediates/classes/debug/org/gaochun/dexlibrary1/')
+    //打包到jar后的目录结构
+    into('org/gaochun/dexlibrary1/')
+    //去掉不需要打包的目录和文件
+    exclude('test/', 'BuildConfig.class', 'R.class')
+    //去掉R$开头的文件
+    exclude { it.name.startsWith('R$') }
+}
+makeJar.dependsOn(clearJar, build)
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+}
