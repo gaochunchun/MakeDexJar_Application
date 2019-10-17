@@ -1,13 +1,14 @@
 apply plugin: 'com.android.application'
-
+//apply from: rootProject.projectDir.absolutePath + '/config/versionConfig.gradle'
 android {
-    compileSdkVersion 27
+    def versions = rootProject.ext.versions
+    compileSdkVersion versions.sdkCompileSdkVersion
     defaultConfig {
-        applicationId "org.gaochun.activity"
-        minSdkVersion 14
-        targetSdkVersion 27
+        minSdkVersion versions.sdkMinVersion
+        targetSdkVersion versions.sdkTargetVersion
         versionCode 1
         versionName "1.0"
+        applicationId "org.gaochun.dexlibrary"
     }
     buildTypes {
         release {
@@ -18,7 +19,9 @@ android {
 }
 
 dependencies {
+    def dependencies = rootProject.ext.deps
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation dependencies.suport.appcompat
+    implementation dependencies.suport.constraint_layout
+    //implementation 'com.android.support.constraint:constraint-layout:1.1.0'
 }

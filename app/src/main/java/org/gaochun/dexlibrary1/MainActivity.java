@@ -1,4 +1,4 @@
-package org.gaochun.activity;
+package org.gaochun.dexlibrary1;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -30,41 +30,47 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 加载dex文件中的class，并调用其中的showToast方法
+     * 加载dex文件中的class，并调用其中的showMessage方法
      */
     private void loadDexClass() {
         File dexOutputDir = getDir("dex", 0);//在data/data/xx包名/下面创建一个app_dex文件夹
-        String internalPath = dexOutputDir.getAbsolutePath() + File.separator + "testDex_dex.jar";
+        String internalPath = dexOutputDir.getAbsolutePath() + File.separator + "dexlibrary1_dex.jar";
         File dexFile = new File(internalPath);
         try {
             if (!dexFile.exists()) {
                 dexFile.createNewFile();
-                FileUtils.copyFiles(this, "testDex_dex.jar", dexFile);
+                //将assets目录下的文件copy到app/data/cache目录
+                FileUtils.copyFiles(this, "dexlibrary1_dex.jar", dexFile);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        //下面开始加载dex class
-        //1.待加载的dex文件路径，如果是外存路径，一定要加上读外存文件的权限,
-        //2.解压后的dex存放位置，此位置一定要是可读写且仅该应用可读写
-        //3.指向包含本地库(so)的文件夹路径，可以设为null
-        //4.父级类加载器，一般可以通过Context.getClassLoader获取到，也可以通过ClassLoader.getSystemClassLoader()取到。
-
-        //注：4.1以后不能够将optimizedDirectory（即第二个参数）设置到sd卡目录， 否则抛出异常. 所以我们使用内部存储路径dexOutputDir
-        // optimizedDirectory：解压后的.dex文件的存储路径，不能为空。这个路径强烈建议使用应用程序的私有路径，不要放到sdcard上，否则代码容易被注入攻击。
+        //加载dex class
         DexClassLoader dexClassLoader = new DexClassLoader(internalPath, dexOutputDir.getAbsolutePath(), null, getClassLoader());
         try {
-            //该name就是internalPath路径下的dex文件里面的ShowToastImpl这个类的包名+类名
+            //该name就是internalPath路径下的dex文件里面的ShowMessageImpl_one这个类的包名+类名
             Class<?> clz = dexClassLoader.loadClass("org.gaochun.dexlibrary1.ShowMessageImpl_one");
-            IMessage impl = (IMessage) clz.newInstance();//通过该方法得到IMessage类
+            IMessage_one impl = (IMessage_one) clz.newInstance();//通过该方法得到IMessage_one类
             if (impl != null) {
                 String value = impl.showMessage(this);//调用打开弹窗并获取值
+                mTextView.setTextColor(getResources().getColor(R.color.red));
                 mTextView.setText(value);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+
+    /**
+     * DexClassLoader类参数含义
+     * @param dexPath   待加载的dex文件路径，如果是外存路径，一定要加上读外存文件的权限
+     * @param optimizedDirectory    解压后的.dex文件存储路径，不可为空，此位置一定要是可读写且仅该应用可读写
+     * @param librarySearchPath     指向包含本地库(so)的文件夹路径，可以设为null
+     * @param parent    父级类加载器，一般可以通过Context.getClassLoader获取到，也可通过ClassLoader.getSystemClassLoader()获取到
+     */
+    //注：4.1以后不能够将第二个参数optimizedDirectory设置到sd卡目录， 否则抛出异常. 强烈建议使用内部私有存储路径（即应用的data/data/xx包名/下面创建一个app_dex文件夹），不要放到sdcard上，代码容易被注入攻击
+    //public DexClassLoader(String dexPath, String optimizedDirectory, String librarySearchPath, ClassLoader parent)
+
 }

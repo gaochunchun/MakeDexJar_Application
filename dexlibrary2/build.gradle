@@ -1,10 +1,11 @@
 apply plugin: 'com.android.library'
+apply from: rootProject.projectDir.absolutePath + '/makeDexJar.gradle'
 android {
-    compileSdkVersion 27
-
+    def versions = rootProject.ext.versions
+    compileSdkVersion versions.sdkCompileSdkVersion
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 27
+        minSdkVersion versions.sdkMinVersion
+        targetSdkVersion versions.sdkTargetVersion
         versionCode 1
         versionName "1.0"
     }
@@ -17,13 +18,20 @@ android {
     }
 
 }
-//删除isshowtoast.jar包任务
-task clearJar(type: Delete) {
-    delete 'libs/testDex.jar'
+
+def outputDexJarName = 'dexlibrary2_dex.jar'
+def jarName = 'dexlibrary2.jar'
+def packagePath = 'org/gaochun/dexlibrary2/'
+readLocalSDKPropertiesToMakeDexJar(outputDexJarName, jarName, packagePath)
+
+
+//删除jar包任务
+/*task clearJar(type: Delete) {
+    delete 'build/libs/dexlibrary2.jar'
 }
 task makeJar(type: Jar) {
     //指定生成的jar名
-    baseName 'testDex'
+    baseName 'dexlibrary2'
     //从哪里打包class文件
     from('build/intermediates/classes/debug/org/gaochun/dexlibrary2/')
     //打包到jar后的目录结构
@@ -33,10 +41,11 @@ task makeJar(type: Jar) {
     //去掉R$开头的文件
     exclude { it.name.startsWith('R$') }
 }
-makeJar.dependsOn(clearJar, build)
+makeJar.dependsOn(clearJar, build)*/
 
 dependencies {
+    def dependencies = rootProject.ext.deps
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation dependencies.suport.appcompat
+    //implementation 'com.android.support:appcompat-v7:27.1.1'
 }
