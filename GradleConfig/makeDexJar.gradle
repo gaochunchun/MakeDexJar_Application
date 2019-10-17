@@ -1,0 +1,84 @@
+//-------------------------  构建Jar和包含Dex的Jar  ---------------------------------
+
+//def zipFile = file('build/intermediates/intermediate-jars/debug/classes.jar')
+//def classPath = 'build/intermediates/classes/debug/com/ccn/SmartWebAPI/'
+/*def outputDexJarName = 'Smart24Decode_dex.jar'
+def jarName = 'Smart24Decode.jar'
+def packagePath = 'com/ccn/Smart24Decode/'
+def dxbatVersion = '28.0.0'*/
+
+//gradle提供了ext，所以我们可以很容易获取其他gradle的属性
+ext {
+    //注意左右的方法名是一样的，this后面有一个&符号
+    readLocalSDKPropertiesToMakeDexJar = this.&readLocalSDKPropertiesToMakeDexJar
+    //其他Gradle文件如果想调用这个方法，一般可以这样：
+    /*def outputDexJarName = 'Smart24Decode_dex.jar'
+    def jarName = 'Smart24Decode.jar'
+    def packagePath = 'com/ccn/Smart24Decode/'
+    //直接调用
+    readLocalSDKPropertiesToMakeDexJar(outputDexJarName, jarName, packagePath)
+    //或者使用task调用
+    task CustomTask << {
+        readLocalSDKPropertiesToMakeDexJar(outputDexJarName, jarName, packagePath)
+    }*/
+}
+
+def readLocalSDKPropertiesToMakeDexJar(outputDexJarName, jarName, packagePath) {
+    //println("我被调用了")
+    //def buildingToolPath = 'D:\\Android\\android-sdk\\build-tools\\28.0.0\\dx.bat'    //编译工具
+    def dxbatVersion = '25.0.0' //因为项目用的是25Level，所以此处用25.0.0的版本构建
+    def dxbat = '\\build-tools\\' + dxbatVersion + '\\dx.bat'
+    def buildingToolPath
+    File file = rootProject.file('local.properties')
+    if (file.exists()) {
+        InputStream inputStream = rootProject.file('local.properties').newDataInputStream();
+        Properties properties = new Properties()
+        properties.load(inputStream)
+        if (properties.containsKey("sdk.dir")) {
+            //println properties.getProperty("sdk.dir")
+            buildingToolPath = properties.getProperty("sdk.dir") + dxbat
+        }
+    }
+    //删除jar包任务
+    task clearJar(type: Delete) {
+        delete 'build/libs/' + jarName
+    }
+
+    //生成不带dex的jar
+    task makeJar(type: Jar) {
+        //baseName 'SmartWebAPI'   //指定生成的jar名
+        archiveName = jarName      //打包普通jar名称
+        from('build/intermediates/classes/debug/' + packagePath)    //从哪里打包class文件
+        into(packagePath)       //打包到jar后的目录结构
+        exclude('test/', 'BuildConfig.class', 'R.class')    //去掉不需要打包的目录和文件
+        exclude { it.name.startsWith('R$') }    //去掉R$开头的文件
+    }
+    //执行makeJar任务时会在之前执行clearjar任务 和 build
+    makeJar.dependsOn(clearJar, build)
+
+    //执行此任务生成包含dex的jar
+    task makeDexJar(type: Exec) {
+        def mCommond = [
+                buildingToolPath, '--dex',//输出包含dex的jar路径及名称
+                '--output=build/libs/' + outputDexJarName,
+                'build/libs/' + jarName //使用dx将jar中的代码优化成dex文件，该步骤也可以手动命令行完成
+        ]
+        commandLine mCommond
+    }
+    //执行makeDexJar的时候会在之前执行makeJar
+    makeDexJar.dependsOn(makeJar)
+}
+
+/*读取local.properties示例
+def readLocalProperties(){
+    File file = rootProject.file('local.properties')
+    if(file.exists()){
+        InputStream inputStream = rootProject.file('local.properties').newDataInputStream();
+        Properties properties = new Properties()
+        properties.load(inputStream)
+
+        if (properties.containsKey("sdk.dir")){
+            println properties.getProperty("sdk.dir")
+        }
+    }
+}*/

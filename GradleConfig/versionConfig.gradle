@@ -1,0 +1,23 @@
+ext {
+    versions = [
+            sdkMinVersion       : 14,
+            sdkTargetVersion    : 27,
+            sdkCompileSdkVersion: 27
+            //其他...
+    ]
+
+    depVersion = [
+            appCompatVersion       : "27.1.1",
+            recyclerViewVersion    : "27.1.1",
+            constraintLayoutVersion: "1.1.0"
+    ]
+
+    deps = [
+            suport: [
+                    appcompat        : "com.android.support:appcompat-v7:${depVersion.appCompatVersion}",
+                    recyclerview     : "com.android.support:recyclerview-v7:${depVersion.recyclerViewVersion}",
+                    constraint_layout: "com.android.support.constraint:constraint-layout:${depVersion.constraintLayoutVersion}"
+            ]
+    ]
+}
+
