@@ -25,8 +25,7 @@ ext {
 
 def readLocalSDKPropertiesToMakeDexJar(outputDexJarName, jarName, packagePath) {
     //println("我被调用了")
-    //编译工具
-    //def buildingToolPath = 'D:\\Android\\android-sdk\\build-tools\\28.0.0\\dx.bat'
+    //def buildingToolPath = 'D:\\Android\\android-sdk\\build-tools\\28.0.0\\dx.bat'    //编译工具
     def dxbatVersion = '25.0.0' //因为项目用的是25Level，所以此处用25.0.0的版本构建
     def dxbat = '\\build-tools\\' + dxbatVersion + '\\dx.bat'
     def buildingToolPath
