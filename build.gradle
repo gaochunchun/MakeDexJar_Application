@@ -1,7 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    apply from: 'versionConfig.gradle'
     repositories {
         google()
         jcenter()
@@ -47,3 +46,5 @@ task clean(type: Delete) {
             ]
     ]
 }*/
+
+apply from: 'GradleConfig/versionConfig.gradle'

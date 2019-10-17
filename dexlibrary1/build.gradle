@@ -1,5 +1,5 @@
 apply plugin: 'com.android.library'
-apply from: rootProject.projectDir.absolutePath + '/makeDexJar.gradle'
+apply from: rootProject.projectDir.absolutePath + '/GradleConfig/makeDexJar.gradle'
 android {
     def versions = rootProject.ext.versions
     compileSdkVersion versions.sdkCompileSdkVersion
